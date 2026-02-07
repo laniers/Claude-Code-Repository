@@ -140,7 +140,7 @@ def launch():
 
     detail_label = tk.Label(
         progress_root,
-        text="This may take a minute",
+        text="Starting Chrome browser — this may take a minute",
         fg="#666666",
         bg="#1e1e1e",
         font=("Helvetica", 10),

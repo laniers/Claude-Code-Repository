@@ -9,14 +9,14 @@ Usage:
 import argparse
 import sys
 
-from .api import search_places, fetch_street_view_image, quit_driver
+from .api import search_places, quit_driver
 from .grid_ui import GridSelector
 from .export import save_to_spreadsheet
 
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Search for places, preview Street View images in a grid, "
+        description="Search for places, preview images in a grid, "
                     "and save selected locations to a spreadsheet. "
                     "No API keys required."
     )
@@ -44,28 +44,23 @@ def main():
 
 
 def _run(args):
-    # 1. Search for places via Nominatim (OpenStreetMap)
     print(f"Searching for: {args.query}")
-    places = search_places(args.query, max_results=args.max_results)
+    print("  (first run may take a moment to start the browser)\n")
+
+    def on_progress(i, total, name):
+        print(f"  [{i+1}/{total}] {name}")
+
+    places, images = search_places(
+        args.query,
+        max_results=args.max_results,
+        on_progress=on_progress,
+    )
 
     if not places:
         print("No results found for that query.")
         sys.exit(0)
 
-    print(f"Found {len(places)} places. Capturing Street View images...")
-    print("  (first capture may take a moment to start the browser)\n")
-
-    # 2. Capture Street View screenshots via headless Chrome
-    images = []
-    for i, place in enumerate(places):
-        print(f"  [{i+1}/{len(places)}] {place['name']}", end="", flush=True)
-        img = fetch_street_view_image(place["lat"], place["lng"])
-        images.append(img)
-        status = " ok" if img else " (no imagery)"
-        print(status)
-
-    # 3. Show grid UI for selection
-    print("\nOpening grid view — select the places you want to save...")
+    print(f"\nOpening grid view — select the places you want to save...")
     selector = GridSelector(places, images)
     selected = selector.run()
 
@@ -73,7 +68,6 @@ def _run(args):
         print("No places selected. Nothing to save.")
         sys.exit(0)
 
-    # 4. Export selected places to spreadsheet
     selected_places = [places[i] for i in selected]
     output_path = save_to_spreadsheet(selected_places, args.query, args.output)
     print(f"\nSaved {len(selected_places)} place(s) to: {output_path}")

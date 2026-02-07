@@ -1,31 +1,26 @@
 # Street View Scraper Grid
 
-Search for businesses/places by query, preview their Google Street View images in a visual grid, select the ones you want, and export them to a spreadsheet.
+Search for businesses/places by query, preview their Google Street View images in a visual grid, select the ones you want, and export them to a spreadsheet. **No API keys required.**
+
+## How it works
+
+1. **Search** — Finds places via [OpenStreetMap Nominatim](https://nominatim.openstreetmap.org/) (free, no key)
+2. **Capture** — Opens Google Street View in headless Chrome and takes screenshots (via Selenium)
+3. **Grid UI** — Displays results in a scrollable Tkinter grid with checkboxes
+4. **Export** — Saves selected places to a styled `.xlsx` spreadsheet
+
+## Prerequisites
+
+- **Python 3.10+**
+- **Google Chrome** or **Chromium** installed on your system
 
 ## Setup
-
-### 1. Install dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 2. Get a Google API key
-
-1. Go to [Google Cloud Console](https://console.cloud.google.com/)
-2. Create a project (or use an existing one)
-3. Enable these APIs:
-   - **Places API (New)**
-   - **Street View Static API**
-4. Create an API key under **APIs & Services → Credentials**
-
-### 3. Set your API key
-
-```bash
-export GOOGLE_API_KEY="your_key_here"
-```
-
-Or copy `.env.example` to `.env` and fill it in (if you use a tool like `python-dotenv`).
+That's it. No API keys, no accounts, no configuration.
 
 ## Usage
 
@@ -37,7 +32,7 @@ python -m streetview_scraper "coffee shops in downtown Austin"
 
 | Flag | Description |
 |---|---|
-| `--max-results N` / `-n N` | Number of results (default 20, max 20) |
+| `--max-results N` / `-n N` | Number of results (default 20) |
 | `--output FILE` / `-o FILE` | Output spreadsheet path (default: auto-generated) |
 
 ### Examples
@@ -50,22 +45,15 @@ python -m streetview_scraper "bike shops in Portland" -o bikes.xlsx
 python -m streetview_scraper "barbershops in Brooklyn" -n 5
 ```
 
-## How it works
-
-1. **Search** — Queries the Google Places Text Search API for matching businesses
-2. **Fetch** — Downloads a Street View thumbnail for each result location
-3. **Grid UI** — Opens a Tkinter window showing all results in a scrollable grid with checkboxes
-4. **Export** — Saves the selected places (name, address, lat/lng, Google Maps link, etc.) to an `.xlsx` spreadsheet
-
 ## Spreadsheet columns
 
 | Column | Description |
 |---|---|
-| Name | Business name |
-| Address | Full formatted address |
+| Name | Business/place name |
+| Address | Full address |
 | Latitude | GPS latitude |
 | Longitude | GPS longitude |
-| Place ID | Google Place ID |
+| Place ID | OpenStreetMap place ID |
 | Google Maps URL | Direct link to Google Maps |
 | Types | Place type tags |
 
@@ -76,7 +64,13 @@ streetview_scraper/
 ├── __init__.py
 ├── __main__.py      # python -m entry point
 ├── main.py          # CLI argument parsing and orchestration
-├── api.py           # Google Places + Street View API calls
+├── api.py           # Nominatim search + Selenium Street View capture
 ├── grid_ui.py       # Tkinter grid selection UI
 └── export.py        # Excel spreadsheet export
 ```
+
+## Notes
+
+- Street View screenshots are cached locally in a `cache/` directory to avoid re-capturing the same locations
+- Nominatim has a rate limit of 1 request/second which is respected automatically
+- The headless Chrome instance is reused across captures for speed

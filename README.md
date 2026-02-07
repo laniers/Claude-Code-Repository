@@ -2,6 +2,22 @@
 
 Search for businesses/places by query, preview their Google Street View images in a visual grid, select the ones you want, and export them to a spreadsheet. **No API keys required.**
 
+## Quick Start (One-Click)
+
+Just double-click the launcher file for your system:
+
+- **Windows:** Double-click `run.bat`
+- **Mac/Linux:** Double-click `run.sh` (or run `bash run.sh`)
+
+A window will open asking what you want to search for. Type your query (e.g. "coffee shops in downtown Austin"), click Search, pick your favorites from the grid, and save to a spreadsheet.
+
+The launcher automatically installs dependencies for you.
+
+## Prerequisites
+
+- **Python 3.10+** — [Download here](https://www.python.org/downloads/) (on Windows, check "Add Python to PATH" during install)
+- **Google Chrome** or **Chromium** installed on your system
+
 ## How it works
 
 1. **Search** — Finds places via [OpenStreetMap Nominatim](https://nominatim.openstreetmap.org/) (free, no key)
@@ -9,22 +25,12 @@ Search for businesses/places by query, preview their Google Street View images i
 3. **Grid UI** — Displays results in a scrollable Tkinter grid with checkboxes
 4. **Export** — Saves selected places to a styled `.xlsx` spreadsheet
 
-## Prerequisites
+## Advanced: Command-Line Usage
 
-- **Python 3.10+**
-- **Google Chrome** or **Chromium** installed on your system
-
-## Setup
+If you prefer the terminal:
 
 ```bash
 pip install -r requirements.txt
-```
-
-That's it. No API keys, no accounts, no configuration.
-
-## Usage
-
-```bash
 python -m streetview_scraper "coffee shops in downtown Austin"
 ```
 
@@ -38,10 +44,7 @@ python -m streetview_scraper "coffee shops in downtown Austin"
 ### Examples
 
 ```bash
-# Search for bike shops, save to a specific file
 python -m streetview_scraper "bike shops in Portland" -o bikes.xlsx
-
-# Limit to 5 results
 python -m streetview_scraper "barbershops in Brooklyn" -n 5
 ```
 
@@ -60,13 +63,16 @@ python -m streetview_scraper "barbershops in Brooklyn" -n 5
 ## Project structure
 
 ```
+run.bat                      # Windows one-click launcher
+run.sh                       # Mac/Linux one-click launcher
 streetview_scraper/
 ├── __init__.py
-├── __main__.py      # python -m entry point
-├── main.py          # CLI argument parsing and orchestration
-├── api.py           # Nominatim search + Selenium Street View capture
-├── grid_ui.py       # Tkinter grid selection UI
-└── export.py        # Excel spreadsheet export
+├── __main__.py              # python -m entry point
+├── main.py                  # CLI argument parsing and orchestration
+├── launcher.py              # GUI launcher (no terminal needed)
+├── api.py                   # Nominatim search + Selenium Street View capture
+├── grid_ui.py               # Tkinter grid selection UI
+└── export.py                # Excel spreadsheet export
 ```
 
 ## Notes
